@@ -29,12 +29,14 @@
     <div class="video-title" id="currentTitle"></div>
   </section>
   <aside class="sidebar">
+    <input type="file" id="csvUpload" accept=".csv" class="search" style="margin-bottom:10px;background:#fff;color:#000;">
     <input id="search" class="search" placeholder="Search videos...">
     <div id="playlist"></div>
   </aside>
 </div>
 <script>
 const csvFile = 'videos.csv';
+const csvUpload = document.getElementById('csvUpload');
 let videos = [];const player = document.getElementById('player'); const currentTitle = document.getElementById('currentTitle'); const playlist = document.getElementById('playlist'); const search = document.getElementById('search');
 
 function playVideo(video){ player.src = https://www.youtube.com/embed/${video.id}?rel=0; currentTitle.textContent = video.title; document.querySelectorAll('.item').forEach(el=>el.classList.toggle('active', el.dataset.id===video.id)); }
@@ -45,15 +47,15 @@ search.addEventListener('input',()=>{ const q=search.value.toLowerCase(); render
 
 function extractVideoId(url){ const match = url.match(/(?:v=|youtu.be/)([A-Za-z0-9_-]{11})/); return match ? match[1] : null; }
 
-async function loadCSV(){ const res = await fetch(csvFile); const text = await res.text();
+function parseCSV(text){ const rows = text.trim().split(/ ? /); const headers = rows[0].match(/("[^"]*"|[^,]+)/g).map(h => h.replace(/^"|"$/g,'').trim()); const titleIndex = headers.indexOf('title'); const videoIdIndex = headers.indexOf('videoId'); const linkIndex = headers.indexOf('videoUrl');
 
-const rows = text.split(/ ? /).filter(row => row.trim()); const headers = rows[0].match(/("[^"]*"|[^,]+)/g).map(h => h.replace(/^"|"$/g, '').trim());
+videos = rows.slice(1).map(row => { const cols = row.match(/("[^"]*"|[^,]+)/g)?.map(c => c.replace(/^"|"$/g,'').trim()) || []; const title = cols[titleIndex] || 'Untitled'; const id = cols[videoIdIndex] || extractVideoId(cols[linkIndex] || ''); return id ? {title,id} : null; }).filter(Boolean);
 
-const titleIndex = headers.indexOf('title'); const videoIdIndex = headers.indexOf('videoId'); const linkIndex = headers.indexOf('videoUrl');
+render(videos); if(videos.length) playVideo(videos[0]); }
 
-videos = rows.slice(1).map(row => { const cols = row.match(/("[^"]*"|[^,]+)/g)?.map(c => c.replace(/^"|"$/g, '').trim()) || []; const title = cols[titleIndex] || 'Untitled'; const id = cols[videoIdIndex] || extractVideoId(cols[linkIndex] || ''); return id ? { title, id } : null; }).filter(Boolean);
+async function loadCSV(){ try{ const res = await fetch(csvFile); const text = await res.text(); parseCSV(text); }catch(e){ currentTitle.textContent = 'Please choose your videos.csv file using the upload box.'; } }
 
-render(videos); if (videos.length) playVideo(videos[0]); }
+csvUpload.addEventListener('change', (e)=>{ const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = ev => parseCSV(ev.target.result); reader.readAsText(file); });
 
 loadCSV(); </script>
 
