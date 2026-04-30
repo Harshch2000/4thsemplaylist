@@ -12,8 +12,10 @@
     .video-title{font-size:1.2rem;margin:14px 0}
     .sidebar{background:#111827;border-radius:18px;padding:16px;max-height:80vh;overflow:auto}
     .search{width:100%;padding:12px;border:none;border-radius:10px;margin-bottom:12px}
-    .item{padding:12px;border-radius:12px;cursor:pointer;margin-bottom:8px;background:#1f2937;transition:.2s}
+    .item{display:flex;gap:12px;align-items:center;padding:12px;border-radius:12px;cursor:pointer;margin-bottom:8px;background:#1f2937;transition:.2s}
     .item:hover,.item.active{background:#2563eb}
+    .thumb{width:120px;height:68px;border-radius:10px;object-fit:cover;flex-shrink:0}
+    .meta{display:flex;flex-direction:column}
     .item small{display:block;color:#cbd5e1;margin-top:4px}
     @media(max-width:900px){.container{grid-template-columns:1fr}}
   </style>
@@ -41,7 +43,7 @@ let videos = [];const player = document.getElementById('player'); const currentT
 
 function playVideo(video){ player.src = https://www.youtube.com/embed/${video.id}?rel=0; currentTitle.textContent = video.title; document.querySelectorAll('.item').forEach(el=>el.classList.toggle('active', el.dataset.id===video.id)); }
 
-function render(list){ playlist.innerHTML=''; list.forEach(video=>{ const div=document.createElement('div'); div.className='item'; div.dataset.id=video.id; div.innerHTML=${video.title}<small>${video.id}</small>; div.onclick=()=>playVideo(video); playlist.appendChild(div); }); }
+function render(list){ playlist.innerHTML=''; list.forEach(video=>{ const div=document.createElement('div'); div.className='item'; div.dataset.id=video.id; div.innerHTML=<img class="thumb" src="https://img.youtube.com/vi/${video.id}/mqdefault.jpg" alt="thumbnail"><div class="meta">${video.title}<small>${video.id}</small></div>; div.onclick=()=>playVideo(video); playlist.appendChild(div); }); }
 
 search.addEventListener('input',()=>{ const q=search.value.toLowerCase(); render(videos.filter(v=>v.title.toLowerCase().includes(q))); });
 
