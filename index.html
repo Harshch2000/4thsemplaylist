@@ -34,7 +34,7 @@
   </aside>
 </div>
 <script>
-const csvFile = 'videos.csv';
+const csvFile = 'videoos.csv';
 let videos = [];const player = document.getElementById('player'); const currentTitle = document.getElementById('currentTitle'); const playlist = document.getElementById('playlist'); const search = document.getElementById('search');
 
 function playVideo(video){ player.src = https://www.youtube.com/embed/${video.id}?rel=0; currentTitle.textContent = video.title; document.querySelectorAll('.item').forEach(el=>el.classList.toggle('active', el.dataset.id===video.id)); }
